@@ -2,10 +2,8 @@ package net.engineeringdigest.journalApp.Controllers;
 
 import net.engineeringdigest.journalApp.entity.JournalEntity;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,9 +31,8 @@ public class JournalEntityController {
         return "Not Implemented as of now... Stay Tuned!";
     }
 
-    @PutMapping
-    public boolean updateEntry(@RequestBody @NotNull JournalEntity je){
-        long id = je.getId();
+    @PutMapping("/{id}")
+    public boolean updateEntry(@PathVariable Long id, @RequestBody @NotNull JournalEntity je){
         if(journalEntities.containsKey(id)){
             journalEntities.replace(id, je);
             return true;
@@ -46,5 +43,10 @@ public class JournalEntityController {
     @GetMapping("/{id}")
     public JournalEntity getEntityById(@PathVariable long id){
         return journalEntities.get(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public JournalEntity deleteEntityById(@PathVariable long id){
+        return journalEntities.remove(id);
     }
 }
