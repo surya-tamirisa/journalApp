@@ -2,10 +2,13 @@ package net.engineeringdigest.journalApp.service;
 
 import net.engineeringdigest.journalApp.entity.JournalEntity;
 import net.engineeringdigest.journalApp.repository.JournalEntryRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -16,18 +19,22 @@ public class JournalEntryService {
     private JournalEntryRepository journalEntryRepository;
 
     public Boolean saveEntry(JournalEntity journalEntity){
-        if(!journalEntryRepository.existsById(journalEntity.getId())){
-            journalEntryRepository.save(journalEntity);
-            return true;
-        } else return false;
+        journalEntryRepository.save(journalEntity);
+        return true;
     }
 
     public List<JournalEntity> getAll() {
         return journalEntryRepository.findAll();
     }
 
-    public Boolean editEntry(JournalEntity je){
-        if(journalEntryRepository.existsById(je.getId())){
+    public Boolean editEntry(ObjectId id, JournalEntity je){
+
+        if(journalEntryRepository.existsById(id.toHexString())){
+            JournalEntity old = journalEntryRepository.findById(id.toHexString()).orElse(null);
+            je.setDate(LocalDateTime.now());
+            je.setId(id);
+            je.setTitle(je.getTitle() != null? je.getTitle() : Objects.requireNonNull(old).getTitle());
+            je.setContent(je.getContent() != null? je.getContent() : Objects.requireNonNull(old).getContent());
             journalEntryRepository.save(je);
             return true;
         } else return false;
