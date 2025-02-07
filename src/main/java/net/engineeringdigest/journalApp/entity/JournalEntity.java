@@ -1,18 +1,23 @@
 package net.engineeringdigest.journalApp.entity;
 
-import org.springframework.stereotype.Component;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Component
+import java.util.Date;
+
+@Document(collection = "journalEntity")
 public class JournalEntity {
-    private Long id;
+    @Id
+    private String id;
     private String title;
     private String content;
+    private Date date;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -30,5 +35,13 @@ public class JournalEntity {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }
