@@ -18,16 +18,15 @@ public class JournalEntryService {
     @Autowired
     private JournalEntryRepository journalEntryRepository;
 
-    public Boolean saveEntry(JournalEntity journalEntity){
+    public void saveEntry(JournalEntity journalEntity){
         journalEntryRepository.save(journalEntity);
-        return true;
     }
 
     public List<JournalEntity> getAll() {
         return journalEntryRepository.findAll();
     }
 
-    public Boolean editEntry(ObjectId id, JournalEntity je){
+    public JournalEntity editEntry(ObjectId id, JournalEntity je){
 
         if(journalEntryRepository.existsById(id.toHexString())){
             JournalEntity old = journalEntryRepository.findById(id.toHexString()).orElse(null);
@@ -36,8 +35,8 @@ public class JournalEntryService {
             je.setTitle(je.getTitle() != null? je.getTitle() : Objects.requireNonNull(old).getTitle());
             je.setContent(je.getContent() != null? je.getContent() : Objects.requireNonNull(old).getContent());
             journalEntryRepository.save(je);
-            return true;
-        } else return false;
+            return je;
+        } else return null;
     }
 
     public Optional<JournalEntity> getEntityById(String id){

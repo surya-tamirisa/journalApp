@@ -45,4 +45,8 @@ public class JournalEntity {
     public void setDate(LocalDateTime date) {
         this.date = date;
     }
+
+    public boolean isPresent() {
+        return false;
+    }
 }
