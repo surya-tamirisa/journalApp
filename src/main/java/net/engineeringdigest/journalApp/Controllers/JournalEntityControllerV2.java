@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("journal")
@@ -23,22 +24,21 @@ public class JournalEntityControllerV2 {
 
     @PostMapping
     public Boolean createEntity(@RequestBody @NotNull JournalEntity je){
-        journalEntryService.saveEntry(je);
-        return true;
+        return journalEntryService.saveEntry(je);
     }
 
     @PutMapping("/{id}")
-    public void updateEntry(@PathVariable Long id, @RequestBody @NotNull JournalEntity je){
-
+    public Boolean updateEntry(@PathVariable String id, @RequestBody @NotNull JournalEntity je){
+        return journalEntryService.editEntry(je);
     }
 
     @GetMapping("/{id}")
-    public JournalEntity getEntityById(@PathVariable String id){
-        return null;
+    public Optional<JournalEntity> getEntityById(@PathVariable String id){
+        return journalEntryService.getEntityById(id);
     }
 
     @DeleteMapping("/{id}")
-    public JournalEntity deleteEntityById(@PathVariable String id){
-        return null;
+    public void deleteEntityById(@PathVariable String id){
+        journalEntryService.deleteEntityById(id);
     }
 }
