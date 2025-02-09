@@ -28,8 +28,8 @@ public class JournalEntryService {
 
     public JournalEntity editEntry(ObjectId id, JournalEntity je){
 
-        if(journalEntryRepository.existsById(id.toHexString())){
-            JournalEntity old = journalEntryRepository.findById(id.toHexString()).orElse(null);
+        if(journalEntryRepository.existsById(id)){
+            JournalEntity old = journalEntryRepository.findById(id).orElse(null);
             je.setDate(LocalDateTime.now());
             je.setId(id);
             je.setTitle(je.getTitle() != null? je.getTitle() : Objects.requireNonNull(old).getTitle());
@@ -39,11 +39,11 @@ public class JournalEntryService {
         } else return null;
     }
 
-    public Optional<JournalEntity> getEntityById(String id){
+    public Optional<JournalEntity> getEntityById(ObjectId id){
         return journalEntryRepository.findById(id);
     }
 
-    public void deleteEntityById(String id){
+    public void deleteEntityById(ObjectId id){
         journalEntryRepository.deleteById(id);
     }
 

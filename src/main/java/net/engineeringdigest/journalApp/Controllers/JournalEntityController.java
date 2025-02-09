@@ -41,14 +41,13 @@ public class JournalEntityController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEntry(@PathVariable @NotNull ObjectId id, @RequestBody @NotNull JournalEntity je){
         JournalEntity response = journalEntryService.editEntry(id, je);
-        System.out.println(response.isPresent());
         if(response != null) {
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<JournalEntity> getEntityById(@PathVariable String id){
+    public ResponseEntity<JournalEntity> getEntityById(@PathVariable ObjectId id){
         Optional<JournalEntity> je = journalEntryService.getEntityById(id);
 
         // return je.map(journalEntity -> new ResponseEntity<>(journalEntity, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT));
@@ -60,7 +59,7 @@ public class JournalEntityController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEntityById(@PathVariable String id){
+    public ResponseEntity<?> deleteEntityById(@PathVariable ObjectId id){
         journalEntryService.deleteEntityById(id);
         return new ResponseEntity<JournalEntity>(HttpStatus.NO_CONTENT);
     }
