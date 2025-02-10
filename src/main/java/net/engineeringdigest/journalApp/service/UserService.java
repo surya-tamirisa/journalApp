@@ -3,7 +3,6 @@ package net.engineeringdigest.journalApp.service;
 
 import net.engineeringdigest.journalApp.entity.User;
 import net.engineeringdigest.journalApp.repository.UserRepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,12 +27,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public Optional<User> getUser(ObjectId id){
-        return userRepository.findById(id);
-    }
-
-    public void deleteUser(ObjectId id){
-        userRepository.deleteById(id);
+    public void deleteUser(User user){
+        userRepository.deleteById(user.getId());
     }
 
     public User findByUsername(String username){

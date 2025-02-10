@@ -1,7 +1,9 @@
 package net.engineeringdigest.journalApp.Controllers;
 
 import net.engineeringdigest.journalApp.entity.JournalEntity;
+import net.engineeringdigest.journalApp.entity.User;
 import net.engineeringdigest.journalApp.service.JournalEntryService;
+import net.engineeringdigest.journalApp.service.UserService;
 import org.bson.types.ObjectId;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -20,30 +23,48 @@ public class JournalEntityController {
     @Autowired
     private JournalEntryService journalEntryService;
 
-    @GetMapping
-    public List<JournalEntity> getAll() {
-        System.out.println("controller handling get all");
-        return journalEntryService.getAll();
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("user/{username}")
+    public ResponseEntity<?> getAllJournalEntriesOfUser(@PathVariable @NotNull String username) {
+        User user = userService.findByUsername(username);
+        List<JournalEntity> all = user.getJournalEntries();
+        if(all!= null && !all.isEmpty()){
+            return new ResponseEntity<List<JournalEntity>>(all, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping
-    public ResponseEntity<JournalEntity> createEntity(@RequestBody @NotNull JournalEntity je){
-        je.setDate(LocalDateTime.now());
-        try{
-            journalEntryService.saveEntry(je);
-            return new ResponseEntity<JournalEntity>(je, HttpStatus.CREATED);
-        } catch(Exception e) {
+    @PostMapping("user/{username}")
+    public ResponseEntity<JournalEntity> createEntity(@PathVariable @NotNull String username, @RequestBody @NotNull JournalEntity je){
+        try {
+            journalEntryService.saveEntry(je, username);
+            return new ResponseEntity<>(je, HttpStatus.OK);
+        } catch (Exception e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateEntry(@PathVariable @NotNull ObjectId id, @RequestBody @NotNull JournalEntity je){
-        JournalEntity response = journalEntryService.editEntry(id, je);
-        if(response != null) {
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    @PutMapping("id/{username}/{id}")
+    public ResponseEntity<?> updateEntry(
+            @PathVariable @NotNull ObjectId id,
+            @RequestBody @NotNull JournalEntity je,
+            @PathVariable String username
+    ){
+//        JournalEntity response = journalEntryService.editEntry(id, je);
+//        if(response != null) {
+//            return new ResponseEntity<>(response, HttpStatus.OK);
+//        } else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        JournalEntity old = journalEntryService.getEntityById(id).orElse(null);
+        if(old != null){
+            old.setTitle(je.getTitle() != null? je.getTitle() : Objects.requireNonNull(old).getTitle());
+            old.setContent(je.getContent() != null? je.getContent() : Objects.requireNonNull(old).getContent());
+            journalEntryService.saveEntry(old);
+            return new ResponseEntity<>(old, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/{id}")
@@ -58,9 +79,9 @@ public class JournalEntityController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEntityById(@PathVariable ObjectId id){
-        journalEntryService.deleteEntityById(id);
+    @DeleteMapping("id/{username}/{id}")
+    public ResponseEntity<?> deleteEntityById(@PathVariable ObjectId id, @PathVariable String username){
+        journalEntryService.deleteEntityById(id, username);
         return new ResponseEntity<JournalEntity>(HttpStatus.NO_CONTENT);
     }
 }

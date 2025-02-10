@@ -58,13 +58,22 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{id}")
-    private User getUser(@PathVariable @NotNull ObjectId id){
-        return null;
+    @GetMapping("/{username}")
+    private ResponseEntity<?> getUser(@PathVariable @NotNull String username){
+        User user = userService.findByUsername(username);
+        if(user!= null) {
+            return new ResponseEntity<User>(user, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/{id}")
-    private User deleteUser() {
-        return null;
+    @DeleteMapping("/{username}")
+    private ResponseEntity<?> deleteUser(@PathVariable @NotNull String username) {
+        User user = userService.findByUsername(username);
+        if(user!= null) {
+            userService.deleteUser(user);
+            return new ResponseEntity<User>(user, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
