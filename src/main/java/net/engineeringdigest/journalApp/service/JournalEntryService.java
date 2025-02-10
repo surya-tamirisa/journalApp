@@ -1,5 +1,6 @@
 package net.engineeringdigest.journalApp.service;
 
+import lombok.extern.slf4j.Slf4j;
 import net.engineeringdigest.journalApp.entity.JournalEntity;
 import net.engineeringdigest.journalApp.entity.User;
 import net.engineeringdigest.journalApp.repository.JournalEntryRepository;
@@ -7,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 
+@Slf4j
 @Component
 public class JournalEntryService {
 
@@ -23,12 +26,18 @@ public class JournalEntryService {
     @Autowired
     private  UserService userService;
 
+    @Transactional
     public void saveEntry(JournalEntity journalEntity, @NotNull String username){
-        User user = userService.findByUsername(username);
-        journalEntity.setDate(LocalDateTime.now());
-        JournalEntity saved = journalEntryRepository.save(journalEntity);
-        user.getJournalEntries().add(saved);
-        userService.updateUser(user);
+        try {
+            User user = userService.findByUsername(username);
+            journalEntity.setDate(LocalDateTime.now());
+            JournalEntity saved = journalEntryRepository.save(journalEntity);
+            user.getJournalEntries().add(saved);
+            userService.updateUser(user);
+        } catch (Exception e){
+            log.error("e: ", e);
+            throw new RuntimeException("An error occurred while saving", e);
+        }
     }
 
     public void saveEntry(JournalEntity journalEntity){

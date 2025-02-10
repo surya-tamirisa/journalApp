@@ -53,10 +53,6 @@ public class JournalEntityController {
             @RequestBody @NotNull JournalEntity je,
             @PathVariable String username
     ){
-//        JournalEntity response = journalEntryService.editEntry(id, je);
-//        if(response != null) {
-//            return new ResponseEntity<>(response, HttpStatus.OK);
-//        } else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         JournalEntity old = journalEntryService.getEntityById(id).orElse(null);
         if(old != null){
             old.setTitle(je.getTitle() != null? je.getTitle() : Objects.requireNonNull(old).getTitle());
